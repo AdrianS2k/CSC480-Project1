@@ -47,8 +47,8 @@ def next_steps(position, dirty, blocked, rows, columns):
 def depth_first_search(start_state, blocked, rows, columns):
     """Depth first search implementation"""
     stack = [(start_state, [])]
-    nodes_generated = 0
-    nodes_expanded = 0
+    generated = 0
+    expanded = 0
     visited = set()
 
     while stack:
@@ -58,17 +58,17 @@ def depth_first_search(start_state, blocked, rows, columns):
         if curr in visited:
             continue
         visited.add(curr)
-        nodes_expanded += 1
+        expanded += 1
 
         if len(dirty) == 0:
-            return (path, nodes_generated, nodes_expanded)
+            return (path, generated, expanded)
         for move, next in next_steps(pos, dirty, blocked, rows, columns):
             if next not in visited:
                 stack.append((next, path + [move]))
-                nodes_generated += 1
+                generated += 1
 
 
-    return [], nodes_generated, nodes_expanded
+    return [], generated, expanded
 
 def uniform_cost_search(start_state, blocked, rows, columns):
     """
@@ -79,27 +79,27 @@ def uniform_cost_search(start_state, blocked, rows, columns):
     heapq.heappush(priority_queue, (0, start_state, []))
     visited = dict() # cost
     visited[start_state] = 0
-    nodes_generated = 1
-    nodes_expanded = 0
+    generated = 1 #start
+    expanded = 0
 
     while priority_queue:
         curr_cost, curr_state, curr_path = heapq.heappop(priority_queue)
         position, dirty_tiles = curr_state
         if not dirty_tiles:
-            return curr_path, nodes_generated, nodes_expanded
-        nodes_expanded += 1
+            return curr_path, generated, expanded
+        expanded += 1
         nodes = next_steps(position, dirty_tiles, blocked, rows, columns)
         for action, next_state in nodes:
             new_cost = curr_cost + 1
             if next_state not in visited or visited[next_state] > new_cost:
                 visited[next_state] = new_cost
                 heapq.heappush(priority_queue, (new_cost, next_state, curr_path + [action]))
-                nodes_generated += 1
+                generated += 1
 
 
 
 
-    return [], nodes_generated, nodes_expanded
+    return [], generated, expanded
 
 
 def main():
